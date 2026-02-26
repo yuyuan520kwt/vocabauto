@@ -49,11 +49,8 @@ jobs:
       run: |
         # Ensure Cython is available
         python -c "import cython; print('Cython version:', cython.__version__)"
-        # Install Java 8 (required for sdkmanager compatibility)
-        sudo apt-get update
-        sudo apt-get install -y openjdk-8-jdk
-        # Set Java 8 as default
-        export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+        # Use Java 11 for compatibility with latest SDK tools
+        export JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
         export PATH=$JAVA_HOME/bin:$PATH
         echo "Using Java: $(java -version)"
         # Use pre-installed Android SDK from setup-android Action
