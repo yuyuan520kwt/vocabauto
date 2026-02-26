@@ -48,8 +48,8 @@ jobs:
     - name: Build APK
       run: |
         # Ensure Cython is available
-        python -c "import cython; print('Cython version:', cython.__version__)"
-        # Use Java 11 for compatibility with latest SDK tools
+        python -c "import cython; print('Cython version:', cython.__version__)
+        # Use Java 11 for compatibility
         export JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
         export PATH=$JAVA_HOME/bin:$PATH
         echo "Using Java: $(java -version)"
@@ -61,31 +61,16 @@ jobs:
         export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH:/home/runner/.local/bin
         # Clear any existing Buildozer configuration
         rm -rf /home/runner/.buildozer
-        # Create minimal Buildozer directory structure
-        mkdir -p /home/runner/.buildozer/android/platform
-        # Create symlinks to actual SDK/NDK locations
-        ln -s $ANDROID_HOME /home/runner/.buildozer/android/platform/android-sdk
-        # Find and link the installed NDK
+        # Set Buildozer to use the system SDK directly
+        export ANDROIDSDK=$ANDROID_HOME
+        # Find installed NDK and set it
         NDK_DIR=$(ls -d $ANDROID_HOME/ndk/* | head -n 1)
-        ln -s $NDK_DIR /home/runner/.buildozer/android/platform/android-ndk-r25
-        # Verify the links and contents
-        echo "=== Verifying SDK/NDK setup ==="
-        ls -la /home/runner/.buildozer/android/platform/
-        ls -la $NDK_DIR
-        echo "=== Check sdkmanager ==="
-        which sdkmanager
-        sdkmanager --version 2>&1 || echo "sdkmanager version check failed"
-        echo "=== Check NDK contents ==="
-        ls -la $NDK_DIR/toolchains
-        # Set Buildozer environment variables
-        export ANDROIDSDK=/home/runner/.buildozer/android/platform/android-sdk
-        export ANDROIDNDK=/home/runner/.buildozer/android/platform/android-ndk-r25
+        export ANDROIDNDK=$NDK_DIR
         export ANDROID_NDK_ROOT=$NDK_DIR
-        # Run Buildozer with debug output
-        echo "Running Buildozer with SDK: $ANDROIDSDK and NDK: $ANDROIDNDK"
-        # First try with --dry-run to see if configuration is correct
-        buildozer android debug --verbose --dry-run 2>&1 || echo "Dry run completed"
-        # Then run actual build with increased verbosity
+        # Print debug info
+        echo "Using Android SDK: $ANDROIDSDK"
+        echo "Using Android NDK: $ANDROIDNDK"
+        # Run Buildozer directly with the system SDK/NDK
         buildozer android debug --verbose
     
     - name: Upload APK

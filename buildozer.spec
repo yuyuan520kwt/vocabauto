@@ -109,7 +109,7 @@ android.api = 31
 android.minapi = 21
 
 # (int) Android SDK version to use
-android.sdk = 24
+# android.sdk = 24
 
 # 自动接受Android SDK许可证（与现有镜像源配置合并）
 
