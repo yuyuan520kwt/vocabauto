@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,opencv,requests,pillow,appium-python-client,pytesseract,speechrecognition
+requirements = python3,kivy,requests,pillow
 
 # (list) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

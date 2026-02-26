@@ -71,14 +71,24 @@ jobs:
         # Find and link the installed NDK
         NDK_DIR=$(ls -d $ANDROID_HOME/ndk/* | head -n 1)
         ln -s $NDK_DIR /home/runner/.buildozer/android/platform/android-ndk-r25
-        # Verify the links
+        # Verify the links and contents
+        echo "=== Verifying SDK/NDK setup ==="
         ls -la /home/runner/.buildozer/android/platform/
+        ls -la $NDK_DIR
+        echo "=== Check sdkmanager ==="
+        which sdkmanager
+        sdkmanager --version 2>&1 || echo "sdkmanager version check failed"
+        echo "=== Check NDK contents ==="
+        ls -la $NDK_DIR/toolchains
         # Set Buildozer environment variables
         export ANDROIDSDK=/home/runner/.buildozer/android/platform/android-sdk
         export ANDROIDNDK=/home/runner/.buildozer/android/platform/android-ndk-r25
         export ANDROID_NDK_ROOT=$NDK_DIR
         # Run Buildozer with debug output
         echo "Running Buildozer with SDK: $ANDROIDSDK and NDK: $ANDROIDNDK"
+        # First try with --dry-run to see if configuration is correct
+        buildozer android debug --verbose --dry-run 2>&1 || echo "Dry run completed"
+        # Then run actual build with increased verbosity
         buildozer android debug --verbose
     
     - name: Upload APK
