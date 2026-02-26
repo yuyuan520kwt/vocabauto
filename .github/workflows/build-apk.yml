@@ -18,6 +18,9 @@ jobs:
       with:
         python-version: '3.10'
     
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+    
     - name: Update package list
       run: sudo apt-get update
     
@@ -39,6 +42,7 @@ jobs:
         export PATH=$PATH:/home/runner/.local/bin
         # Ensure Cython is available
         python -c "import cython; print('Cython version:', cython.__version__)"
+        # Android SDK is already set up with licenses accepted
         # Run buildozer with verbose output
         buildozer android debug --verbose
     
