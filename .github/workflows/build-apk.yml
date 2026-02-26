@@ -69,11 +69,14 @@ jobs:
         export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_NDK_ROOT:$PATH:/home/runner/.local/bin
         # Clear any existing Buildozer configuration that might conflict
         rm -rf /home/runner/.buildozer
-        # Create Buildozer directory structure
+        # Create complete Buildozer directory structure
         mkdir -p /home/runner/.buildozer/android/platform
-        # Copy the pre-installed SDK and NDK to Buildozer's directory
-        cp -r $ANDROID_HOME /home/runner/.buildozer/android/platform/android-sdk
-        cp -r $ANDROID_NDK_ROOT /home/runner/.buildozer/android/platform/android-ndk-r25
+        mkdir -p /home/runner/.buildozer/android/platform/android-sdk
+        mkdir -p /home/runner/.buildozer/android/platform/android-ndk-r25
+        # Copy the pre-installed SDK contents to Buildozer's directory
+        cp -r $ANDROID_HOME/* /home/runner/.buildozer/android/platform/android-sdk/
+        # Copy the pre-installed NDK contents to Buildozer's directory
+        cp -r $ANDROID_NDK_ROOT/* /home/runner/.buildozer/android/platform/android-ndk-r25/
         # Verify the copied SDK and NDK
         ls -la /home/runner/.buildozer/android/platform/
         # Run Buildozer with explicit SDK/NDK paths
