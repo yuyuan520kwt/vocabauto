@@ -31,11 +31,16 @@ jobs:
     - name: Upgrade pip
       run: pip install --upgrade pip
     
-    - name: Install Buildozer
-      run: pip install --upgrade buildozer
+    - name: Install Buildozer and Cython
+      run: pip install --upgrade buildozer cython==0.29.30
     
     - name: Build APK
-      run: buildozer android debug
+      run: |
+        export PATH=$PATH:/home/runner/.local/bin
+        # Ensure Cython is available
+        python -c "import cython; print('Cython version:', cython.__version__)"
+        # Run buildozer with verbose output
+        buildozer android debug --verbose
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
