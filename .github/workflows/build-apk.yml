@@ -60,9 +60,10 @@ jobs:
         export ANDROID_HOME=/usr/local/lib/android/sdk
         export ANDROID_SDK_ROOT=$ANDROID_HOME
         export ANDROID_SDK_HOME=$ANDROID_HOME
-        # Find the installed NDK version
-        NDK_VERSION=$(ls -la $ANDROID_HOME/ndk | grep -oP '[0-9]+\.[0-9]+\.[0-9]+')
+        # Find the installed NDK version (get the first one)
+        NDK_VERSION=$(ls -la $ANDROID_HOME/ndk | grep -oP '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
         export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$NDK_VERSION
+        echo "Selected NDK version: $NDK_VERSION"
         echo "Using Android SDK: $ANDROID_HOME"
         echo "Using Android NDK: $ANDROID_NDK_ROOT"
         # Add SDK tools to PATH
@@ -70,7 +71,6 @@ jobs:
         # Clear any existing Buildozer configuration that might conflict
         rm -rf /home/runner/.buildozer
         # Create complete Buildozer directory structure
-        mkdir -p /home/runner/.buildozer/android/platform
         mkdir -p /home/runner/.buildozer/android/platform/android-sdk
         mkdir -p /home/runner/.buildozer/android/platform/android-ndk-r25
         # Copy the pre-installed SDK contents to Buildozer's directory
