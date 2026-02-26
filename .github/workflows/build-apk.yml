@@ -21,6 +21,14 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v2
     
+    - name: Display Android SDK info
+      run: |
+        echo "ANDROID_HOME=$ANDROID_HOME"
+        echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+        ls -la $ANDROID_HOME
+        ls -la $ANDROID_HOME/tools/bin
+        which sdkmanager
+    
     - name: Update package list
       run: sudo apt-get update
     
@@ -39,30 +47,28 @@ jobs:
     
     - name: Build APK
       run: |
-        export PATH=$PATH:/home/runner/.local/bin
+        export PATH=$PATH:/home/runner/.local/bin:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
         # Ensure Cython is available
         python -c "import cython; print('Cython version:', cython.__version__)"
-        # Buildozer uses a custom SDK path (from the logs: /home/runner/.buildozer/android/platform/android-sdk/)
-        export BUILDOZER_SDK_PATH=/home/runner/.buildozer/android/platform/android-sdk
-        export ANDROID_HOME=$BUILDOZER_SDK_PATH
-        export ANDROID_SDK_ROOT=$BUILDOZER_SDK_PATH
-        export ANDROID_SDK_HOME=$BUILDOZER_SDK_PATH
-        # Create the SDK and licenses directory structure first
-        mkdir -p $BUILDOZER_SDK_PATH/licenses
-        mkdir -p $BUILDOZER_SDK_PATH/build-tools
-        # Create license acceptance files in Buildozer's SDK directory
-        # Android SDK Platform license
-        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $BUILDOZER_SDK_PATH/licenses/android-sdk-license
-        # Android SDK Build-Tools license
-        echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > $BUILDOZER_SDK_PATH/licenses/android-sdk-build-tools-license
-        # Android SDK Platform Tools license
-        echo "84831b9409646a918e30573bab4c9c91346d8abd" > $BUILDOZER_SDK_PATH/licenses/android-sdk-platform-tools-license
-        # Android NDK license
-        echo "33b6a2b64607f11b759f320ef9f6218a66df9470" > $BUILDOZER_SDK_PATH/licenses/android-sdk-ndk-license
-        # Also create licenses in the user's .android directory (some tools look here)
-        mkdir -p /home/runner/.android
-        echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > /home/runner/.android/repositories.cfg
-        # Run buildozer with verbose output
+        # Force Buildozer to use the Android SDK installed by setup-android Action
+        export ANDROID_HOME=${ANDROID_HOME:-/home/runner/Android/Sdk}
+        export ANDROID_SDK_ROOT=$ANDROID_HOME
+        export ANDROID_SDK_HOME=$ANDROID_HOME
+        # Create Buildozer's SDK directory and link to the installed SDK
+        BUILDOZER_SDK_PATH=/home/runner/.buildozer/android/platform/android-sdk
+        mkdir -p $(dirname $BUILDOZER_SDK_PATH)
+        # Create symlink to use the pre-installed SDK
+        if [ ! -d "$BUILDOZER_SDK_PATH" ]; then
+          ln -s "$ANDROID_HOME" "$BUILDOZER_SDK_PATH"
+          echo "Created symlink from $BUILDOZER_SDK_PATH to $ANDROID_HOME"
+        fi
+        # Verify the symlink and sdkmanager
+        ls -la $BUILDOZER_SDK_PATH
+        ls -la $BUILDOZER_SDK_PATH/tools/bin
+        which sdkmanager
+        # Install required SDK components explicitly
+        sdkmanager --install "platform-tools" "build-tools;33.0.0" "platforms;android-24" --verbose
+        # Run buildozer with the pre-configured SDK
         buildozer android debug --verbose
     
     - name: Upload APK
