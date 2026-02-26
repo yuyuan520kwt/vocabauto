@@ -55,21 +55,24 @@ jobs:
         export ANDROID_SDK_HOME=$ANDROID_HOME
         # Add SDK tools to PATH
         export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH:/home/runner/.local/bin
-        # Verify the pre-installed SDK and sdkmanager
+        # Set Java 8 compatibility for sdkmanager
+        export JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64
+        export PATH=$JAVA_HOME/bin:$PATH
+        # Verify Java version and SDK
+        echo "Using Java: $(java -version)"
         echo "Using Android SDK at: $ANDROID_HOME"
         which sdkmanager
-        ls -la $ANDROID_HOME
-        ls -la $ANDROID_HOME/tools/bin
-        # Install required SDK components explicitly
-        echo "Installing required SDK components..."
-        sdkmanager --install "platform-tools" "build-tools;33.0.0" "build-tools;37.0.0-rc1" "platforms;android-24" --verbose
-        # Create Buildozer's directory structure
+        # Create Buildozer's directory structure and link to existing SDK
         BUILDOZER_DIR=/home/runner/.buildozer/android/platform
         mkdir -p $BUILDOZER_DIR
-        # Instead of symlink, copy necessary files
-        cp -r $ANDROID_HOME $BUILDOZER_DIR/android-sdk
-        echo "Copied SDK to Buildozer's directory"
-        # Run buildozer with debug output
+        # Create symlink to SDK (Buildozer needs this structure)
+        if [ ! -d "$BUILDOZER_DIR/android-sdk" ]; then
+          ln -s "$ANDROID_HOME" "$BUILDOZER_DIR/android-sdk"
+          echo "Created symlink from $BUILDOZER_DIR/android-sdk to $ANDROID_HOME"
+        fi
+        # Install Java 8 for compatibility (required by sdkmanager)
+        sudo apt-get install -y openjdk-8-jdk
+        # Run buildozer with the correct environment
         echo "Running Buildozer..."
         buildozer android debug --verbose
     
