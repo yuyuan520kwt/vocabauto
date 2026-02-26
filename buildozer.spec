@@ -111,8 +111,7 @@ android.minapi = 21
 # (int) Android SDK version to use
 android.sdk = 24
 
-# 自动接受Android SDK许可证
-p4a.extra_args = --accept-android-sdk-licenses --accept-android-ndk-licenses
+# 自动接受Android SDK许可证（与现有镜像源配置合并）
 
 # 设置环境变量自动接受许可证
 android.env = ANDROID_ACCEPT_SDK_LICENSES=yes ANDROID_SDK_HOME=/home/runner/.android
@@ -313,7 +312,7 @@ android.manifest_placeholders = [appAuthRedirectScheme:com.example.vocabulary]
 p4a.setup_py = true
 
 # (str) extra command line arguments to pass when invoking pythonforandroid.toolchain
-p4a.extra_args = --index-url=https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host=pypi.tuna.tsinghua.edu.cn
+p4a.extra_args = --index-url=https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host=pypi.tuna.tsinghua.edu.cn --accept-android-sdk-licenses --accept-android-ndk-licenses
 
 
 
