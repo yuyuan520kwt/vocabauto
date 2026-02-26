@@ -28,6 +28,8 @@ jobs:
         ls -la $ANDROID_HOME
         ls -la $ANDROID_HOME/tools/bin
         which sdkmanager
+        # Install necessary SDK components including aidl
+        sdkmanager --install "build-tools;33.0.0" --verbose
     
     - name: Update package list
       run: sudo apt-get update
@@ -37,7 +39,7 @@ jobs:
         sudo apt-get install -y build-essential git python3-dev python3-pip \
         libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
         libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
-        zlib1g-dev libgl1-mesa-dev
+        zlib1g-dev libgl1-mesa-dev android-sdk-build-tools
     
     - name: Upgrade pip
       run: pip install --upgrade pip
