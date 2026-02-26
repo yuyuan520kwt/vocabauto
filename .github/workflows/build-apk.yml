@@ -47,28 +47,30 @@ jobs:
     
     - name: Build APK
       run: |
-        export PATH=$PATH:/home/runner/.local/bin:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
         # Ensure Cython is available
         python -c "import cython; print('Cython version:', cython.__version__)"
-        # Force Buildozer to use the Android SDK installed by setup-android Action
-        export ANDROID_HOME=${ANDROID_HOME:-/home/runner/Android/Sdk}
+        # Use the pre-installed Android SDK from setup-android Action
+        export ANDROID_HOME=/usr/local/lib/android/sdk
         export ANDROID_SDK_ROOT=$ANDROID_HOME
         export ANDROID_SDK_HOME=$ANDROID_HOME
-        # Create Buildozer's SDK directory and link to the installed SDK
-        BUILDOZER_SDK_PATH=/home/runner/.buildozer/android/platform/android-sdk
-        mkdir -p $(dirname $BUILDOZER_SDK_PATH)
-        # Create symlink to use the pre-installed SDK
-        if [ ! -d "$BUILDOZER_SDK_PATH" ]; then
-          ln -s "$ANDROID_HOME" "$BUILDOZER_SDK_PATH"
-          echo "Created symlink from $BUILDOZER_SDK_PATH to $ANDROID_HOME"
-        fi
-        # Verify the symlink and sdkmanager
-        ls -la $BUILDOZER_SDK_PATH
-        ls -la $BUILDOZER_SDK_PATH/tools/bin
+        # Add SDK tools to PATH
+        export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH:/home/runner/.local/bin
+        # Verify the pre-installed SDK and sdkmanager
+        echo "Using Android SDK at: $ANDROID_HOME"
         which sdkmanager
+        ls -la $ANDROID_HOME
+        ls -la $ANDROID_HOME/tools/bin
         # Install required SDK components explicitly
-        sdkmanager --install "platform-tools" "build-tools;33.0.0" "platforms;android-24" --verbose
-        # Run buildozer with the pre-configured SDK
+        echo "Installing required SDK components..."
+        sdkmanager --install "platform-tools" "build-tools;33.0.0" "build-tools;37.0.0-rc1" "platforms;android-24" --verbose
+        # Create Buildozer's directory structure
+        BUILDOZER_DIR=/home/runner/.buildozer/android/platform
+        mkdir -p $BUILDOZER_DIR
+        # Instead of symlink, copy necessary files
+        cp -r $ANDROID_HOME $BUILDOZER_DIR/android-sdk
+        echo "Copied SDK to Buildozer's directory"
+        # Run buildozer with debug output
+        echo "Running Buildozer..."
         buildozer android debug --verbose
     
     - name: Upload APK
