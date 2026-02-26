@@ -111,6 +111,12 @@ android.minapi = 21
 # (int) Android SDK version to use
 android.sdk = 24
 
+# 自动接受Android SDK许可证
+p4a.extra_args = --accept-android-sdk-licenses --accept-android-ndk-licenses
+
+# 设置环境变量自动接受许可证
+android.env = ANDROID_ACCEPT_SDK_LICENSES=yes ANDROID_SDK_HOME=/home/runner/.android
+
 # (str) Android NDK version to use
 android.ndk = 23b
 
