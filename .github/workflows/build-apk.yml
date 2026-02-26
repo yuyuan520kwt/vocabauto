@@ -56,34 +56,29 @@ jobs:
         export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
         export PATH=$JAVA_HOME/bin:$PATH
         echo "Using Java: $(java -version)"
-        # Use pre-installed Android SDK and NDK from setup-android Action
+        # Use pre-installed Android SDK from setup-android Action
         export ANDROID_HOME=/usr/local/lib/android/sdk
         export ANDROID_SDK_ROOT=$ANDROID_HOME
         export ANDROID_SDK_HOME=$ANDROID_HOME
-        # Find the installed NDK version (get the first one)
-        NDK_VERSION=$(ls -la $ANDROID_HOME/ndk | grep -oP '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
-        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$NDK_VERSION
-        echo "Selected NDK version: $NDK_VERSION"
-        echo "Using Android SDK: $ANDROID_HOME"
-        echo "Using Android NDK: $ANDROID_NDK_ROOT"
         # Add SDK tools to PATH
-        export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_NDK_ROOT:$PATH:/home/runner/.local/bin
-        # Clear any existing Buildozer configuration that might conflict
+        export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH:/home/runner/.local/bin
+        # Clear any existing Buildozer configuration
         rm -rf /home/runner/.buildozer
-        # Create complete Buildozer directory structure
-        mkdir -p /home/runner/.buildozer/android/platform/android-sdk
-        mkdir -p /home/runner/.buildozer/android/platform/android-ndk-r25
-        # Copy the pre-installed SDK contents to Buildozer's directory
-        cp -r $ANDROID_HOME/* /home/runner/.buildozer/android/platform/android-sdk/
-        # Copy the pre-installed NDK contents to Buildozer's directory
-        cp -r $ANDROID_NDK_ROOT/* /home/runner/.buildozer/android/platform/android-ndk-r25/
-        # Verify the copied SDK and NDK
+        # Create minimal Buildozer directory structure
+        mkdir -p /home/runner/.buildozer/android/platform
+        # Create symlinks to actual SDK/NDK locations
+        ln -s $ANDROID_HOME /home/runner/.buildozer/android/platform/android-sdk
+        # Find and link the installed NDK
+        NDK_DIR=$(ls -d $ANDROID_HOME/ndk/* | head -n 1)
+        ln -s $NDK_DIR /home/runner/.buildozer/android/platform/android-ndk-r25
+        # Verify the links
         ls -la /home/runner/.buildozer/android/platform/
-        # Run Buildozer with explicit SDK/NDK paths
+        # Set Buildozer environment variables
         export ANDROIDSDK=/home/runner/.buildozer/android/platform/android-sdk
         export ANDROIDNDK=/home/runner/.buildozer/android/platform/android-ndk-r25
+        export ANDROID_NDK_ROOT=$NDK_DIR
         # Run Buildozer with debug output
-        echo "Running Buildozer..."
+        echo "Running Buildozer with SDK: $ANDROIDSDK and NDK: $ANDROIDNDK"
         buildozer android debug --verbose
     
     - name: Upload APK
