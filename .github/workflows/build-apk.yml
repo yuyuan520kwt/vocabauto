@@ -63,8 +63,15 @@ jobs:
         export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH:/home/runner/.local/bin
         # Clear any existing Buildozer configuration
         rm -rf /home/runner/.buildozer
-        # Set Buildozer to use the system SDK directly
-        export ANDROIDSDK=$ANDROID_HOME
+        # Create Buildozer directory structure
+        mkdir -p /home/runner/.buildozer/android/platform
+        # Create symlink to system SDK
+        ln -s $ANDROID_HOME /home/runner/.buildozer/android/platform/android-sdk
+        # Verify build tools are installed
+        echo "Checking build tools installation..."
+        ls -la $ANDROID_HOME/build-tools
+        # Set Buildozer environment variables to use its own directory structure
+        export ANDROIDSDK=/home/runner/.buildozer/android/platform/android-sdk
         # Find installed NDK and set it
         NDK_DIR=$(ls -d $ANDROID_HOME/ndk/* | head -n 1)
         export ANDROIDNDK=$NDK_DIR
@@ -72,7 +79,9 @@ jobs:
         # Print debug info
         echo "Using Android SDK: $ANDROIDSDK"
         echo "Using Android NDK: $ANDROIDNDK"
-        # Run Buildozer directly with the system SDK/NDK
+        echo "Build tools available:"
+        ls -la $ANDROIDSDK/build-tools
+        # Run Buildozer with debug output
         buildozer android debug --verbose
     
     - name: Upload APK
