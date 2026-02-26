@@ -117,7 +117,7 @@ android.sdk = 24
 android.env = ANDROID_ACCEPT_SDK_LICENSES=yes ANDROID_SDK_HOME=/home/runner/.android
 
 # (str) Android NDK version to use
-android.ndk = 23b
+android.ndk = 25
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 android.ndk_api = 21
