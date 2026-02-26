@@ -42,9 +42,14 @@ jobs:
         export PATH=$PATH:/home/runner/.local/bin
         # Ensure Cython is available
         python -c "import cython; print('Cython version:', cython.__version__)"
-        # Android SDK is already set up with licenses accepted
-        # Run buildozer with verbose output
-        buildozer android debug --verbose
+        # Set environment variables to force license acceptance
+        export ANDROID_ACCEPT_SDK_LICENSES=yes
+        export ANDROID_ACCEPT_NDK_LICENSES=yes
+        export ANDROID_HOME=/home/runner/Android/Sdk
+        export ANDROID_SDK_ROOT=/home/runner/Android/Sdk
+        export ANDROID_SDK_HOME=/home/runner/Android/Sdk
+        # Run buildozer with license acceptance parameters
+        buildozer android debug --verbose -- --accept-android-licenses
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
