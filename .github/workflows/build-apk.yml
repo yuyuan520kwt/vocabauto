@@ -48,7 +48,7 @@ jobs:
     - name: Build APK
       run: |
         # Ensure Cython is available
-        python -c "import cython; print('Cython version:', cython.__version__)
+        python -c "import cython; print('Cython version:', cython.__version__)"
         # Use Java 11 for compatibility
         export JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
         export PATH=$JAVA_HOME/bin:$PATH
